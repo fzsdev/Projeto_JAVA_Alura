@@ -11,6 +11,7 @@ public class App {
     public static void main(String[] args) throws Exception {
 
         String url = "https://raw.githubusercontent.com/alura-cursos/imersao-java-2-api/main/TopMovies.json";
+        //String url = "https://github.com/fzsdev/api_request_fzs/blob/main/top-250-imdb.json";
         URI endereco = URI.create(url);
         var client = HttpClient.newHttpClient();
         var request = HttpRequest.newBuilder(endereco).GET().build();

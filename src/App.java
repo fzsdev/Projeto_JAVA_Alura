@@ -1,45 +1,34 @@
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.util.List;
-import java.util.Map;
 
 public class App {
 
     public static void main(String[] args) throws Exception {
+        //ContentExtractor extract = new ExtractImdb();
+        //String url = "https://raw.githubusercontent.com/alura-cursos/imersao-java-2-api/main/TopMovies.json";
 
-        String url = "https://raw.githubusercontent.com/alura-cursos/imersao-java-2-api/main/TopMovies.json";
+        String url = "https://api.nasa.gov/planetary/apod?api_key=TB1B23omnnyGDEpXI2za8OR9E2HF0ONlnVTsPe5u&start_date=2022-06-01&end_date=2022-06-30";
+        ContentExtractor extract = new ExtractNasa();
+
         //String url = "https://raw.githubusercontent.com/fzsdev/api_request_fzs/main/top-250-imdb.json";
-        URI endereco = URI.create(url);
-        var client = HttpClient.newHttpClient();
-        var request = HttpRequest.newBuilder(endereco).GET().build();
-        HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-        String body = response.body();
 
-        var parser = new JsonParser();
-        List<Map<String, String>> listaDeFilmes = parser.parse(body);
-        System.out.println(listaDeFilmes.size());
+        var http = new ClientHttp();
+        String json = http.buscaDados(url);
+
+
+        List<Content> contents = extract.extractorContent(json);
 
         var gerador = new Stickers();
 
-        for (Map<String, String> filme : listaDeFilmes) {
+        for (int i = 0; i < 5; i++) {
+            Content content = contents.get(i);
 
-            String urlImagem = filme.get("image");
-            String titulo = filme.get("title");
-            InputStream inputStream = new URL(urlImagem).openStream();
-            String nomeArquivo = titulo + ".png";
+            InputStream inputStream = new URL(content.getUrlImagem()).openStream();
+            String nomeArquivo = "saida/NASA/" + content.getTitulo() + ".png"; //trocar pasta de saida NASA/IMDB
             gerador.createSticker(inputStream, nomeArquivo);
 
-            System.out.println(titulo);
-
-            /*
-            System.out.println(filme.get("image"));
-            System.out.println(filme.get("imDbRating"));
-            */
+            System.out.println(content.getTitulo());
 
             System.out.println();
         }
